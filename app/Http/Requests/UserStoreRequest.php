@@ -4,9 +4,10 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+// use Illuminate\Validation\Rule;
+// use Illuminate\Validation\Rules;
 
-class ProfileUpdateRequest extends FormRequest
+class UserStoreRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -17,7 +18,9 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string|max:255',
-            'email' => ['email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+            'email' => 'nullable|string|email|max:255|unique:'.User::class,
+            'password' => 'nullable|string',
+            //
             'first_name' => 'nullable|string|max:100',
             'first_names' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
