@@ -6,10 +6,10 @@
     RewriteEngine On
 
     # Force HTTPS & non-WWW domain
-    RewriteCond %{HTTP_HOST} ^(www\.)(.+) [OR]
-    RewriteCond %{HTTPS} off
-    RewriteCond %{HTTP_HOST} ^(www\.)?(.+)
-    RewriteRule ^ https://%2%{REQUEST_URI} [L,R=301]
+    #RewriteCond %{HTTP_HOST} ^(www\.)(.+) [OR]
+    #RewriteCond %{HTTPS} off
+    #RewriteCond %{HTTP_HOST} ^(www\.)?(.+)
+    #RewriteRule ^ https://%2%{REQUEST_URI} [L,R=301]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
