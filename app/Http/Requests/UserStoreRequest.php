@@ -26,8 +26,8 @@ class UserStoreRequest extends FormRequest
             'last_name' => 'nullable|string|max:255',
             'initials' => 'nullable|string|max:255',
             'gender' => 'nullable|string|max:100',
-            'date_of_birth' => 'nullable|date_format:Y-m-d',
-            'date_of_death' => 'nullable|date_format:Y-m-d',
+            'date_of_birth' => 'nullable|date_format:d-m-Y',
+            'date_of_death' => 'nullable|date_format:d-m-Y',
         ];
     }
 }

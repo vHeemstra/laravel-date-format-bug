@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Chrome, Safari, Edge, Opera */
+input.input-number-as-text::-webkit-outer-spin-button,
+input.input-number-as-text::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number].input-number-as-text {
+  -moz-appearance: textfield;
+}
+
+[data-lastpass-root] {
+    overflow: hidden !important;
+}
+
+.datepicker-picker {
+    @apply inset-x-[-1px];
+
+    > div {
+        @apply flex-col;
+    }
+
+    &.downward {
+        @apply top-full -mt-1.5 rounded-t-none border-t-0 pt-1.5;
+
+        > div {
+            // @apply flex-col;
+            @apply pt-1 pb-2;
+        }
+    }
+
+    &.upward {
+        @apply bottom-full -mb-1.5 rounded-b-none border-b-0 pb-1.5;
+
+        > div {
+            // @apply flex-col-reverse;
+            @apply pt-3 pb-0;
+        }
+    }
+}

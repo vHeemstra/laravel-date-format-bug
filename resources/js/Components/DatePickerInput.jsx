@@ -2,6 +2,9 @@ import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'r
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faXmark } from '@fortawesome/free-solid-svg-icons';
 
+// TODO: downward / upward display (dependend on available space)
+// TODO? month navigation left/right arrow buttons
+
 // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#parameters
 const dayFormatter = new Intl.DateTimeFormat(undefined, {
     // weekday: "long",
@@ -145,6 +148,39 @@ export default forwardRef( function DatePickerInput({
         setValue(`${d}-${m}-${y}`);
     }, [setValue]);
 
+    const onFocusClearButton = useCallback((e) => {
+        // If clear button receives focus from element outside picker, redirect to input.
+        if (e.relatedTarget && !wrapper.current?.contains(e.relatedTarget)) {
+            e.preventDefault();
+            input.current.focus();
+        }
+    }, []);
+
+    const clearField = useCallback((e) => {
+        e.preventDefault();
+        input.current.focus();
+        setValue('');
+    }, [setValue]);
+
+    const onFocusInput = useCallback((e) => {
+        updateMonthYearAccordingToValue(e.target.value);
+
+        // Calculate which vertical half it's on
+        // and open towards the other half.
+        const { top, bottom } = wrapper.current.getBoundingClientRect();
+        const directionToggle = top > window.innerHeight - bottom;
+        picker.current?.classList.toggle('downward', !directionToggle);
+        picker.current?.classList.toggle('upward', directionToggle);
+
+        picker.current?.classList.remove('hidden');
+    }, [updateMonthYearAccordingToValue]);
+
+    const onBlurWrapper = useCallback((e) => {
+        if (!e.relatedTarget || !wrapper.current?.contains(e.relatedTarget) ) {
+            picker.current?.classList.add('hidden');
+        }
+    }, []);
+
     const clearIsShown = useMemo(() => {
         return showClear && input.current?.value?.length > 0;
     }, [input.current?.value, showClear]);
@@ -198,32 +234,6 @@ export default forwardRef( function DatePickerInput({
         });
     }, [weekDayStart, month, year, selectedDayIfSelectedMonthIsShowing, pickDate, onKeyDownDay]);
 
-    const onFocusClearButton = useCallback((e) => {
-        // If clear button receives focus from element outside picker, redirect to input.
-        if (e.relatedTarget && !wrapper.current?.contains(e.relatedTarget)) {
-            e.preventDefault();
-            input.current.focus();
-        }
-    }, []);
-
-    const clearField = useCallback((e) => {
-        e.preventDefault();
-        input.current.focus();
-        setValue('');
-    }, [setValue]);
-
-    const onFocusInput = useCallback((e) => {
-        updateMonthYearAccordingToValue(e.target.value);
-
-        picker.current?.classList.remove('hidden');
-    }, [updateMonthYearAccordingToValue]);
-
-    const onBlurWrapper = useCallback((e) => {
-        if (!e.relatedTarget || !wrapper.current?.contains(e.relatedTarget) ) {
-            picker.current?.classList.add('hidden');
-        }
-    }, []);
-
     useEffect(() => {
         if (isFocused) {
             input.current.focus();
@@ -258,7 +268,7 @@ export default forwardRef( function DatePickerInput({
 
             {clearIsShown && <a href="#"
                 className={
-                    "absolute outline-0 top-0 right-0 ms-[1px] flex items-center h-full pr-3 " +
+                    "z-20 absolute outline-0 top-0 right-0 ms-[1px] flex items-center h-full pr-3 " +
                     "text-gray-300 focus:text-red-500 hover:text-red-500 "
                 }
                 onClick={clearField}
@@ -267,22 +277,22 @@ export default forwardRef( function DatePickerInput({
                 <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
             </a>}
 
-            {showIcon && <div className="absolute top-0 left-0 ms-[1px] flex items-center h-full pl-3 pointer-events-none">
+            {showIcon && <div className="z-20 absolute top-0 left-0 ms-[1px] flex items-center h-full pl-3 pointer-events-none">
                 <FontAwesomeIcon icon={faCalendarDays} className="w-5 h-5 text-gray-300 group-focus-within:text-indigo-300" />
             </div>}
 
             <div
                 ref={picker}
                 className={
-                    "hidden " +
-                    "absolute inset-[-1px] top-full -mt-1.5 h-fit pt-1.5 " +
-                    "rounded-md rounded-t-none shadow-lg " +
-                    "border-2 border-t-0 border-indigo-500 ring-indigo-500 " +
-                    "border-gray-300 bg-white"
+                    "datepicker-picker " +
+                    "hidden z-10 absolute h-fit " +
+                    // "shadow-lg " +
+                    "rounded-md border-2 " +
+                    "border-indigo-500 ring-indigo-500 bg-white"
                 }
             >
-                <div className="flex flex-col">
-                    <div className="flex flex-row justify-center gap-2 px-2 mt-1">
+                <div className="flex">
+                    <div className="flex flex-row justify-center gap-2 px-2">
                         <select
                             onChange={onChangeMonth}
                             onKeyDown={onKeyDownMonth}
@@ -313,7 +323,7 @@ export default forwardRef( function DatePickerInput({
                             />
                         </span>
                     </div>
-                    <div ref={calendar} className="grid grid-cols-7 px-2 mt-3 mb-2">
+                    <div ref={calendar} className="grid grid-cols-7 px-2 mt-3">
                         {weekDayHeads}
                         {dayButtons}
                     </div>
